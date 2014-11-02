@@ -330,6 +330,7 @@ function! s:base._init()
 	let self.variables.exit = 0
 	let self.variables.exit_code = 1
 	let self.variables.enable_keymapping = 1
+	let self.variables.fallthrough = ''
 	call self.hl_cursor_off()
 	if !hlexists(self.highlights.cursor)
 		execute "highlight link " . self.highlights.cursor . " Cursor"
@@ -393,13 +394,18 @@ function! s:base._input(input, ...)
 		let key = a:input
 	endif
 
-	for char in s:String.split_by_keys(key)
+	let chars = s:String.split_by_keys(key)
+	for char in chars
 		let self.variables.input_key = char
 		let self.variables.char = char
 		call self.setchar(self.variables.char)
 		call self.callevent("on_char_pre")
 		call self.insert(self.variables.input)
 		call self.callevent("on_char")
+		if self._is_exit()
+			let self.variables.fallthrough = join(chars[index(chars, char)+1:], '')
+			return -1
+		endif
 	endfor
 endfunction
 
