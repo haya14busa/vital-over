@@ -1,0 +1,35 @@
+scriptencoding utf-8
+Describe Over.String
+
+  Before all
+    let s:V = vital#of('vital')
+    let s:SL = s:V.import('Vim.ScriptLocal')
+    let g:S = s:SL.sfuncs('autoload/vital/__latest__/Over/String.vim')
+  End
+
+  After all
+    unlet g:S
+  End
+
+  Describe .split_by_keys
+    It search forward with \<\> keeping cursor position
+      Assert Equals(g:S.split_by_keys("abcd"), ["a", "b", "c", "d"])
+      Assert Equals(g:S.split_by_keys("\<Down>"), ["\<Down>"])
+      Assert Equals(g:S.split_by_keys("\<Down>a"), ["\<Down>", "a"])
+      Assert Equals(g:S.split_by_keys("\<Down>\<BS>"), ["\<Down>", "\<BS>"])
+      Assert Equals(g:S.split_by_keys("\<Down>\<BS>\<BS><BS>"), ["\<Down>", "\<BS>", "\<BS>", "<", "B", "S", ">"])
+      Assert Equals(g:S.split_by_keys("\<C-a>+"), ["\<C-a>", "+"])
+      Assert Equals(g:S.split_by_keys("<Over>(scroll-e)"), ["<Over>(scroll-e)"])
+      Assert Equals(g:S.split_by_keys("\<CR>"), ["\<CR>"])
+      Assert Equals(g:S.split_by_keys("\<A-Space>\<CR>\<A-Down>"), ["\<A-Space>", "\<CR>", "\<A-down>"])
+      Assert Equals(g:S.split_by_keys("234567"), ["2", "3", "4", "5", "6", "7"])
+      Assert Equals(g:S.split_by_keys("<Over>(exit)aa"), ["<Over>(exit)", "a", "a"])
+      Assert Equals(g:S.split_by_keys("aa\<A-[>aa\<C-a>"), ['a', 'a', "\<A-[>", 'a', 'a', "\<C-a>"])
+      Assert Equals(g:S.split_by_keys("aa\<A-@>aa\<C-a>"), ['a', 'a', "\<A-@>", 'a', 'a', "\<C-a>"])
+    End
+  End
+
+End
+
+
+
